@@ -9,7 +9,12 @@ defmodule NewRelic.Error.LoggerHandler do
     Logger.remove_translator({__MODULE__, :translator})
   end
 
-  def translator(_level, _message, _timestamp, {_, [report | _]}) when is_list(report) do
+  def translator(_level, _message, kind, {_, [report | _]}) when is_list(report) do
+    if is_nil(report[:error_info]) do
+      IO.inspect(kind, label: "Report kind")
+      IO.inspect(report, label: "Error report missing error_info")
+    end
+
     if NewRelic.Transaction.Sidecar.tracking?() do
       NewRelic.Error.Reporter.report_error(:transaction, report)
     else

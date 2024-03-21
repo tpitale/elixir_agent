@@ -28,6 +28,10 @@ defmodule NewRelic.Error.Reporter do
   end
 
   def report_error(:transaction, report) do
+    if is_nil(report[:error_info]) do
+      IO.inspect(report, label: "Transaction report missing error_info")
+    end
+
     {kind, exception, stacktrace} = parse_error_info(report[:error_info])
     process_name = parse_process_name(report[:registered_name], stacktrace)
 
@@ -41,6 +45,10 @@ defmodule NewRelic.Error.Reporter do
   end
 
   def report_error(:process, report) do
+    if is_nil(report[:error_info]) do
+      IO.inspect(report, label: "Process report missing error_info")
+    end
+
     {kind, exception, stacktrace} = parse_error_info(report[:error_info])
 
     {exception_type, exception_reason, exception_stacktrace} =
